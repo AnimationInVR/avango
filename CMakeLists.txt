@@ -40,7 +40,6 @@ include(file_copy_macro)
 
 include(find_guacamole)
 include(find_guacamole_gui)
-include(FindGuacamolePLOD)
 set(GUACAMOLE_EXT_DIR ${GUACAMOLE_INCLUDE_DIRS}/../externals)
 
 if (UNIX)
@@ -62,6 +61,10 @@ include(find_schism)
 if (AVANGO_DISTRIBUTION_SUPPORT)
     include(FindZMQ)
 endif (AVANGO_DISTRIBUTION_SUPPORT)
+
+if (AVANGO_PBR_SUPPORT)
+  include(FindGuacamolePLOD)
+endif (AVANGO_PBR_SUPPORT)
 
 if (UNIX)
     list(APPEND BOOST_LIBRARIES boost_thread boost_signals boost_python3)
