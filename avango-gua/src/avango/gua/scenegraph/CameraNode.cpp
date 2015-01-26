@@ -1,4 +1,5 @@
 #include <avango/gua/scenegraph/CameraNode.hpp>
+#include <avango/gua/network/NetTransform.h>
 #include <avango/Base.h>
 #include <boost/bind.hpp>
 #include <avango/Logger.h>
@@ -17,11 +18,7 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
     : Node(guaCameraNode)
     , m_guaNode(guaCameraNode)
 {
-  m_pipelineDescription = av::Link<av::gua::PipelineDescription>(
-                            new av::gua::PipelineDescription(
-                              std::make_shared<::gua::PipelineDescription>(m_guaNode->config.pipeline_description())
-                            )
-                          );
+  m_PipelineDescription = av::Link<av::gua::PipelineDescription>(new av::gua::PipelineDescription(m_guaNode->get_pipeline_description()));
 
   AV_FC_ADD_ADAPTOR_FIELD(Enabled,
                       boost::bind(&CameraNode::getEnabledCB, this, _1),
@@ -67,6 +64,14 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
                       boost::bind(&CameraNode::getMonoModeCB, this, _1),
                       boost::bind(&CameraNode::setMonoModeCB, this, _1));
 
+  AV_FC_ADD_ADAPTOR_FIELD(FarClip,
+                      boost::bind(&CameraNode::getFarClipCB, this, _1),
+                      boost::bind(&CameraNode::setFarClipCB, this, _1));
+
+  AV_FC_ADD_ADAPTOR_FIELD(NearClip,
+                      boost::bind(&CameraNode::getNearClipCB, this, _1),
+                      boost::bind(&CameraNode::setNearClipCB, this, _1));
+
   AV_FC_ADD_ADAPTOR_FIELD(Resolution,
                       boost::bind(&CameraNode::getResolutionCB, this, _1),
                       boost::bind(&CameraNode::setResolutionCB, this, _1));
@@ -83,6 +88,22 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
                       boost::bind(&CameraNode::getEnableFrustumCullingCB, this, _1),
                       boost::bind(&CameraNode::setEnableFrustumCullingCB, this, _1));
 
+  AV_FC_ADD_ADAPTOR_FIELD(WhiteList,
+                      boost::bind(&CameraNode::getWhiteListCB, this, _1),
+                      boost::bind(&CameraNode::setWhiteListCB, this, _1));
+
+  AV_FC_ADD_ADAPTOR_FIELD(BlackList,
+                      boost::bind(&CameraNode::getBlackListCB, this, _1),
+                      boost::bind(&CameraNode::setBlackListCB, this, _1));
+
+  AV_FC_ADD_ADAPTOR_FIELD(ApplicationFPS,
+                      boost::bind(&CameraNode::getApplicationFPSCB, this, _1),
+                      boost::bind(&CameraNode::setApplicationFPSCB, this, _1));
+
+  AV_FC_ADD_ADAPTOR_FIELD(RenderingFPS,
+                      boost::bind(&CameraNode::getRenderingFPSCB, this, _1),
+                      boost::bind(&CameraNode::setRenderingFPSCB, this, _1));
+
   AV_FC_ADD_ADAPTOR_FIELD(PreRenderCameras,
                       boost::bind(&CameraNode::getPreRenderCamerasCB, this, _1),
                       boost::bind(&CameraNode::setPreRenderCamerasCB, this, _1));
@@ -90,6 +111,19 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
 
 av::gua::CameraNode::~CameraNode()
 {}
+
+void av::gua::CameraNode::on_distribute(av::gua::NetTransform& netNode)
+{
+    Node::on_distribute(netNode);
+    // netNode.distributeFieldContainer(m_PipelineDescription);
+}
+
+void av::gua::CameraNode::on_undistribute(av::gua::NetTransform& netNode)
+{
+    Node::on_undistribute(netNode);
+    // netNode.undistributeFieldContainer(m_PipelineDescription);
+}
+
 
 void
 av::gua::CameraNode::initClass()
@@ -102,6 +136,8 @@ av::gua::CameraNode::initClass()
 
         SFCameraNode::initClass("av::gua::SFCameraNode", "av::Field");
         MFCameraNode::initClass("av::gua::MFCameraNode", "av::Field");
+
+        sClassTypeId.setDistributable(true);
     }
 }
 
@@ -126,14 +162,18 @@ av::gua::CameraNode::setEnabledCB(const SFBool::SetValueEvent& event)
 void
 av::gua::CameraNode::getPipelineDescriptionCB(const SFPipelineDescription::GetValueEvent& event)
 {
-  *(event.getValuePtr()) = m_pipelineDescription;
+  if (m_PipelineDescription.isValid()) {
+    *(event.getValuePtr()) = m_PipelineDescription;
+  }
 }
 
 void
 av::gua::CameraNode::setPipelineDescriptionCB(const SFPipelineDescription::SetValueEvent& event)
 {
-  m_pipelineDescription = event.getValue();
-  m_guaNode->config.pipeline_description() = *m_pipelineDescription->getGuaPipelineDescription().get();
+  if (event.getValue().isValid()) {
+    m_PipelineDescription = event.getValue();
+    m_guaNode->set_pipeline_description(m_PipelineDescription->getGuaPipelineDescription());
+  }
 }
 
 void
@@ -245,6 +285,30 @@ av::gua::CameraNode::setMonoModeCB(const SFUInt::SetValueEvent& event)
 }
 
 void
+av::gua::CameraNode::getFarClipCB(const SFFloat::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->config.far_clip();
+}
+
+void
+av::gua::CameraNode::setFarClipCB(const SFFloat::SetValueEvent& event)
+{
+  m_guaNode->config.far_clip() = event.getValue();
+}
+
+void
+av::gua::CameraNode::getNearClipCB(const SFFloat::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->config.near_clip();
+}
+
+void
+av::gua::CameraNode::setNearClipCB(const SFFloat::SetValueEvent& event)
+{
+  m_guaNode->config.near_clip() = event.getValue();
+}
+
+void
 av::gua::CameraNode::getResolutionCB(const SFVec2ui::GetValueEvent& event)
 {
   *(event.getValuePtr()) = m_guaNode->config.resolution();
@@ -293,9 +357,58 @@ av::gua::CameraNode::setEnableFrustumCullingCB(const SFBool::SetValueEvent& even
 }
 
 void
+av::gua::CameraNode::getWhiteListCB(const MFString::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->config.mask().whitelist.get_strings();
+}
+
+void
+av::gua::CameraNode::setWhiteListCB(const MFString::SetValueEvent& event)
+{
+  m_guaNode->config.mask().whitelist.clear_tags();
+  for (auto tag : event.getValue()) {
+    m_guaNode->config.mask().whitelist.add_tag(tag);
+  }
+}
+
+void
+av::gua::CameraNode::getBlackListCB(const MFString::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->config.mask().blacklist.get_strings();
+}
+
+void
+av::gua::CameraNode::setBlackListCB(const MFString::SetValueEvent& event)
+{
+  m_guaNode->config.mask().blacklist.clear_tags();
+  for (auto tag : event.getValue()) {
+    m_guaNode->config.mask().blacklist.add_tag(tag);
+  }
+}
+
+void
+av::gua::CameraNode::getApplicationFPSCB(const SFFloat::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->get_application_fps();
+}
+
+void
+av::gua::CameraNode::setApplicationFPSCB(const SFFloat::SetValueEvent& event)
+{}
+
+void
+av::gua::CameraNode::getRenderingFPSCB(const SFFloat::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->get_rendering_fps();
+}
+
+void
+av::gua::CameraNode::setRenderingFPSCB(const SFFloat::SetValueEvent& event)
+{}
+
+void
 av::gua::CameraNode::getPreRenderCamerasCB(const MultiField<Link<CameraNode>>::GetValueEvent& event)
 {
-
   *(event.getValuePtr()) = m_preRenderCameraNodes;
 }
 

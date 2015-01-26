@@ -15,13 +15,10 @@ AV_FC_DEFINE(av::gua::MaterialShaderMethod);
 AV_FIELD_DEFINE(av::gua::SFMaterialShaderMethod);
 AV_FIELD_DEFINE(av::gua::MFMaterialShaderMethod);
 
-av::gua::MaterialShaderMethod::MaterialShaderMethod(::gua::MaterialShaderMethod const& guaMaterialShaderMethod)
+av::gua::MaterialShaderMethod::MaterialShaderMethod(std::shared_ptr< ::gua::MaterialShaderMethod> const& guaMaterialShaderMethod)
     : m_guaMaterialShaderMethod(guaMaterialShaderMethod)
+    , m_distributed(false)
 {
-
-  AV_FC_ADD_ADAPTOR_FIELD(FileName,
-                      boost::bind(&MaterialShaderMethod::getFileNameCB, this, _1),
-                      boost::bind(&MaterialShaderMethod::setFileNameCB, this, _1));
 
   AV_FC_ADD_ADAPTOR_FIELD(Name,
                       boost::bind(&MaterialShaderMethod::getNameCB, this, _1),
@@ -30,6 +27,20 @@ av::gua::MaterialShaderMethod::MaterialShaderMethod(::gua::MaterialShaderMethod 
   AV_FC_ADD_ADAPTOR_FIELD(Source,
                       boost::bind(&MaterialShaderMethod::getSourceCB, this, _1),
                       boost::bind(&MaterialShaderMethod::setSourceCB, this, _1));
+
+  AV_FC_ADD_FIELD(m_serializedUniforms, "");
+  AV_FC_ADD_FIELD(m_uniformsDirty, false);
+}
+
+void av::gua::MaterialShaderMethod::on_distribute(av::gua::NetTransform& netNode) 
+{
+  m_distributed = true;
+  m_uniformsDirty.setValue(true);
+}
+
+void av::gua::MaterialShaderMethod::on_undistribute(av::gua::NetTransform& netNode) 
+{   
+  m_distributed = false;
 }
 
 void
@@ -43,47 +54,50 @@ av::gua::MaterialShaderMethod::initClass()
 
         SFMaterialShaderMethod::initClass("av::gua::SFMaterialShaderMethod", "av::Field");
         MFMaterialShaderMethod::initClass("av::gua::MFMaterialShaderMethod", "av::Field");
+
+        sClassTypeId.setDistributable(true);
     }
 }
 
-
-void
-av::gua::MaterialShaderMethod::getFileNameCB(const SFString::GetValueEvent& event)
-{
-  *(event.getValuePtr()) = m_guaMaterialShaderMethod.get_file_name();
-}
-
-void
-av::gua::MaterialShaderMethod::setFileNameCB(const SFString::SetValueEvent& event)
-{
-  m_guaMaterialShaderMethod.load_from_file(event.getValue());
+void av::gua::MaterialShaderMethod::fieldHasChangedLocalSideEffect(Field const& field) {
+    if (field.getName() == "m_serializedUniforms") {
+        if (!m_distributed) {
+            m_guaMaterialShaderMethod->set_uniforms_from_serialized_string(m_serializedUniforms.getValue());
+        }
+    } else if (field.getName() == "m_uniformsDirty") {
+        if (m_distributed) {
+            std::stringstream sstr;
+            m_guaMaterialShaderMethod->serialize_uniforms_to_stream(sstr);
+            m_serializedUniforms.setValue(sstr.str());
+        }
+    }
 }
 
 void
 av::gua::MaterialShaderMethod::getNameCB(const SFString::GetValueEvent& event)
 {
-  *(event.getValuePtr()) = m_guaMaterialShaderMethod.get_name();
+  *(event.getValuePtr()) = m_guaMaterialShaderMethod->get_name();
 }
 
 void
 av::gua::MaterialShaderMethod::setNameCB(const SFString::SetValueEvent& event)
 {
-  m_guaMaterialShaderMethod.set_name(event.getValue());
+  m_guaMaterialShaderMethod->set_name(event.getValue());
 }
 
 void
 av::gua::MaterialShaderMethod::getSourceCB(const SFString::GetValueEvent& event)
 {
-  *(event.getValuePtr()) = m_guaMaterialShaderMethod.get_source();
+  *(event.getValuePtr()) = m_guaMaterialShaderMethod->get_source();
 }
 
 void
 av::gua::MaterialShaderMethod::setSourceCB(const SFString::SetValueEvent& event)
 {
-  m_guaMaterialShaderMethod.set_source(event.getValue());
+  m_guaMaterialShaderMethod->set_source(event.getValue());
 }
 
-::gua::MaterialShaderMethod const&
+std::shared_ptr< ::gua::MaterialShaderMethod> const&
 av::gua::MaterialShaderMethod::getGuaMaterialShaderMethod() const
 {
     return m_guaMaterialShaderMethod;

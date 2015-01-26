@@ -6,6 +6,9 @@
 #include <avango/Base.h>
 #include <avango/Application.h>
 #include <avango/Logger.h>
+
+#include <gua/gui/Interface.hpp>
+
 #include <boost/bind.hpp>
 
 #include <chrono>
@@ -27,7 +30,7 @@ av::gua::Viewer::Viewer()
 {
     AV_FC_ADD_FIELD(CameraNodes, MFCameraNode::ContainerType());
     AV_FC_ADD_FIELD(SceneGraphs, MFSceneGraph::ContainerType());
-    AV_FC_ADD_FIELD(Window, nullptr);
+    AV_FC_ADD_FIELD(Windows,     MFWindowBase::ContainerType());
 #if defined(AVANGO_PHYSICS_SUPPORT)
     AV_FC_ADD_FIELD(Physics, nullptr);
 #endif
@@ -69,6 +72,9 @@ av::gua::Viewer::setDesiredFPSCB(const av::SFFloat::SetValueEvent& event)
 
 void
 av::gua::Viewer::run() const {
+
+  ::gua::Logger::enable_debug = false;
+
   if (!m_renderer) {
     m_renderer = new av::gua::Renderer(new ::gua::Renderer());
   }
@@ -85,11 +91,15 @@ av::gua::Viewer::run() const {
   m_ticker.on_tick.connect([&,this]() {
     PyEval_RestoreThread(save_state);
 
-    if (Window.getValue().isValid() && !Window.getValue()->is_open()) {
-      Window.getValue()->open();
+    for (auto& window: Windows.getValue()) {
+      if(!window->is_open()) {
+        window->open();
+      }
     }
 
     av::ApplicationInstance::get().evaluate();
+
+    ::gua::Interface::instance()->update();
 
     if (SceneGraphs.getValue().size() > 0 && CameraNodes.getValue().size() > 0) {
 
@@ -114,11 +124,11 @@ av::gua::Viewer::run() const {
     }
 #endif
 
-    if (Window.getValue().isValid()) {
-      Window.getValue()->process_events();
+    for (auto& window: Windows.getValue()) {
+      window->process_events();
 
-      if (Window.getValue()->should_close()) {
-        Window.getValue()->close();
+      if(window->should_close()) {
+        window->close();
       }
     }
 
@@ -128,8 +138,8 @@ av::gua::Viewer::run() const {
 
   m_loop.start();
 
- if (Window.getValue().isValid() && Window.getValue()->is_open()) {
-    Window.getValue()->close();
- }
+  for (auto& window: Windows.getValue()) {
+    window->close();
+  }
 
 }

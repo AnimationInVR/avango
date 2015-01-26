@@ -1,4 +1,5 @@
 #include <avango/gua/scenegraph/Node.hpp>
+#include <avango/gua/network/NetTransform.h>
 #include <avango/gua/Types.hpp>
 #include <avango/Base.h>
 #include <boost/bind.hpp>
@@ -50,6 +51,9 @@ av::gua::Node::Node(std::shared_ptr< ::gua::node::Node> guanode)
   AV_FC_ADD_ADAPTOR_FIELD(BoundingBox,
                         boost::bind(&Node::getBoundingBoxCB, this, _1),
                         boost::bind(&Node::setBoundingBoxCB, this, _1));
+  AV_FC_ADD_ADAPTOR_FIELD(DisplayBoundingBox,
+                        boost::bind(&Node::getDisplayBoundingBoxCB, this, _1),
+                        boost::bind(&Node::setDisplayBoundingBoxCB, this, _1));
   AV_FC_ADD_ADAPTOR_FIELD(Depth,
                         boost::bind(&Node::getDepthCB, this, _1),
                         boost::bind(&Node::setDepthCB, this, _1));
@@ -57,10 +61,22 @@ av::gua::Node::Node(std::shared_ptr< ::gua::node::Node> guanode)
                         boost::bind(&Node::getPathCB, this, _1),
                         boost::bind(&Node::setPathCB, this, _1));
 
+  AV_FC_ADD_ADAPTOR_FIELD(Tags,
+                        boost::bind(&Node::getTagsCB, this, _1),
+                        boost::bind(&Node::setTagsCB, this, _1));
+
 }
 
 av::gua::Node::~Node()
 {}
+
+void av::gua::Node::on_distribute(av::gua::NetTransform& netNode)
+{
+}
+
+void av::gua::Node::on_undistribute(av::gua::NetTransform& netNode)
+{
+}
 
 void
 av::gua::Node::initClass()
@@ -195,6 +211,18 @@ av::gua::Node::setBoundingBoxCB(const SFBoundingBox::SetValueEvent& event)
 }
 
 void
+av::gua::Node::getDisplayBoundingBoxCB(const SFBool::GetValueEvent& event)
+{
+    *(event.getValuePtr()) = m_guaNode->get_draw_bounding_box();
+}
+
+void
+av::gua::Node::setDisplayBoundingBoxCB(const SFBool::SetValueEvent& event)
+{
+    m_guaNode->set_draw_bounding_box(event.getValue());
+}
+
+void
 av::gua::Node::getDepthCB(const SFInt::GetValueEvent& event)
 {
     *(event.getValuePtr()) = m_guaNode->get_depth();
@@ -217,6 +245,22 @@ av::gua::Node::setPathCB(const SFString::SetValueEvent& event)
 {
   // std::cout << "A node's path cannot be set!" << std::endl;
 }
+
+void
+av::gua::Node::getTagsCB(const MFString::GetValueEvent& event)
+{
+  *(event.getValuePtr()) = m_guaNode->get_tags().get_strings();
+}
+
+void
+av::gua::Node::setTagsCB(const MFString::SetValueEvent& event)
+{
+  m_guaNode->get_tags().clear_tags();
+  for (auto tag : event.getValue()) {
+    m_guaNode->get_tags().add_tag(tag);
+  }
+}
+
 
 void
 av::gua::Node::addToParentChildren() {

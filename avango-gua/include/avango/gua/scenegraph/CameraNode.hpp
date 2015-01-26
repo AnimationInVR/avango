@@ -45,6 +45,9 @@ namespace av
       CameraNode( std::shared_ptr< ::gua::node::CameraNode> guaCameraNode =
           std::shared_ptr< ::gua::node::CameraNode>(new ::gua::node::CameraNode("")));
 
+      virtual void on_distribute(av::gua::NetTransform& netNode);
+      virtual void on_undistribute(av::gua::NetTransform& netNode);
+
     protected:
 
       /**
@@ -71,12 +74,22 @@ namespace av
       SFString              RightScreenPath;
       SFUInt                MonoMode;
 
+      SFFloat               FarClip;
+      SFFloat               NearClip;
+
       SFVec2ui              Resolution;
 
       SFString              OutputTextureName;
       SFString              OutputWindowName;
 
       SFBool                EnableFrustumCulling;
+
+      MFString              WhiteList;
+      MFString              BlackList;
+
+      SFFloat               ApplicationFPS;
+      SFFloat               RenderingFPS;
+
 
       MultiField<Link<CameraNode>> PreRenderCameras;
 
@@ -113,6 +126,12 @@ namespace av
       virtual void getMonoModeCB(const SFUInt::GetValueEvent& event);
       virtual void setMonoModeCB(const SFUInt::SetValueEvent& event);
 
+      virtual void getFarClipCB(const SFFloat::GetValueEvent& event);
+      virtual void setFarClipCB(const SFFloat::SetValueEvent& event);
+
+      virtual void getNearClipCB(const SFFloat::GetValueEvent& event);
+      virtual void setNearClipCB(const SFFloat::SetValueEvent& event);
+
       virtual void getResolutionCB(const SFVec2ui::GetValueEvent& event);
       virtual void setResolutionCB(const SFVec2ui::SetValueEvent& event);
 
@@ -124,6 +143,18 @@ namespace av
 
       virtual void getEnableFrustumCullingCB(const SFBool::GetValueEvent& event);
       virtual void setEnableFrustumCullingCB(const SFBool::SetValueEvent& event);
+
+      virtual void getWhiteListCB(const MFString::GetValueEvent& event);
+      virtual void setWhiteListCB(const MFString::SetValueEvent& event);
+
+      virtual void getBlackListCB(const MFString::GetValueEvent& event);
+      virtual void setBlackListCB(const MFString::SetValueEvent& event);
+
+      virtual void getApplicationFPSCB(const SFFloat::GetValueEvent& event);
+      virtual void setApplicationFPSCB(const SFFloat::SetValueEvent& event);
+
+      virtual void getRenderingFPSCB(const SFFloat::GetValueEvent& event);
+      virtual void setRenderingFPSCB(const SFFloat::SetValueEvent& event);
 
       virtual void getPreRenderCamerasCB(const  MultiField<Link<CameraNode>>::GetValueEvent& event);
       virtual void setPreRenderCamerasCB(const  MultiField<Link<CameraNode>>::SetValueEvent& event);
@@ -140,10 +171,9 @@ namespace av
     private:
 
       std::shared_ptr< ::gua::node::CameraNode> m_guaNode;
-      av::Link<av::gua::PipelineDescription>    m_pipelineDescription;
-
 
       MultiField<Link<CameraNode>>::ContainerType m_preRenderCameraNodes;
+      av::Link< av::gua::PipelineDescription> m_PipelineDescription;
 
       CameraNode(const CameraNode&);
       CameraNode& operator=(const CameraNode&);

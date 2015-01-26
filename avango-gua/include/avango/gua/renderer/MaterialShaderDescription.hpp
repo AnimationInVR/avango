@@ -16,6 +16,7 @@ namespace av
 {
   namespace gua
   {
+    class NetTransform;
     /**
      * Wrapper for ::gua::MaterialShaderDescription
      *
@@ -31,19 +32,16 @@ namespace av
        * Constructor. When called without arguments, a new ::gua::MaterialShaderDescription is created.
        * Otherwise, the given ::gua::MaterialShaderDescription is used.
        */
-      MaterialShaderDescription(::gua::MaterialShaderDescription const& guaMaterialShaderDescription =
-                                ::gua::MaterialShaderDescription());
+      MaterialShaderDescription(std::shared_ptr< ::gua::MaterialShaderDescription> const& guaMaterialShaderDescription =
+                                std::shared_ptr< ::gua::MaterialShaderDescription>(new ::gua::MaterialShaderDescription()));
 
-
+      virtual void on_distribute(av::gua::NetTransform& netNode);
+      virtual void on_undistribute(av::gua::NetTransform& netNode);
 
     public:
 
-      SFString FileName;
       MFMaterialShaderMethod VertexMethods;
       MFMaterialShaderMethod FragmentMethods;
-
-      virtual void getFileNameCB(const SFString::GetValueEvent& event);
-      virtual void setFileNameCB(const SFString::SetValueEvent& event);
 
       virtual void getVertexMethodsCB(const MFMaterialShaderMethod::GetValueEvent& event);
       virtual void setVertexMethodsCB(const MFMaterialShaderMethod::SetValueEvent& event);
@@ -51,14 +49,16 @@ namespace av
       virtual void getFragmentMethodsCB(const MFMaterialShaderMethod::GetValueEvent& event);
       virtual void setFragmentMethodsCB(const MFMaterialShaderMethod::SetValueEvent& event);
 
+      void load_from_file(std::string const& file);
+      void load_from_json(std::string const& json);
       /**
        * Get the wrapped ::gua::MaterialShaderDescription.
        */
-      ::gua::MaterialShaderDescription const& getGuaMaterialShaderDescription() const;
+      std::shared_ptr< ::gua::MaterialShaderDescription> const& getGuaMaterialShaderDescription() const;
 
     private:
 
-      ::gua::MaterialShaderDescription m_guaMaterialShaderDescription;
+      std::shared_ptr< ::gua::MaterialShaderDescription> m_guaMaterialShaderDescription;
 
       MFMaterialShaderMethod::ContainerType m_vertexMethods;
       MFMaterialShaderMethod::ContainerType m_fragmentMethods;

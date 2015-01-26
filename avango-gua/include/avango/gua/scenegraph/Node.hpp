@@ -17,6 +17,7 @@ namespace av
 {
   namespace gua
   {
+    class NetTransform;
     /**
      * Wrapper for ::gua::Node
      *
@@ -34,6 +35,12 @@ namespace av
        */
       Node(std::shared_ptr< ::gua::node::Node> guanode); // use defined type to circumvent compiler bug in VS8
 
+      /**
+       * Override these to distribute embedded field containers.
+       */
+      virtual void on_distribute(av::gua::NetTransform& netNode);
+      virtual void on_undistribute(av::gua::NetTransform& netNode);
+
     protected:
 
       /**
@@ -50,8 +57,10 @@ namespace av
       SFMatrix                  Transform;
       SFMatrix                  WorldTransform;
       SFBoundingBox             BoundingBox;
+      SFBool                    DisplayBoundingBox;
       SFInt                     Depth;
       SFString                  Path;
+      MFString                  Tags;
 
       /**
        * Get the wrapped ::gua::Node.
@@ -80,11 +89,17 @@ namespace av
       virtual void getBoundingBoxCB(const SFBoundingBox::GetValueEvent& event);
       virtual void setBoundingBoxCB(const SFBoundingBox::SetValueEvent& event);
 
+      virtual void getDisplayBoundingBoxCB(const SFBool::GetValueEvent& event);
+      virtual void setDisplayBoundingBoxCB(const SFBool::SetValueEvent& event);
+
       virtual void getDepthCB(const SFInt::GetValueEvent& event);
       virtual void setDepthCB(const SFInt::SetValueEvent& event);
 
       virtual void getPathCB(const SFString::GetValueEvent& event);
       virtual void setPathCB(const SFString::SetValueEvent& event);
+
+      virtual void getTagsCB(const MFString::GetValueEvent& event);
+      virtual void setTagsCB(const MFString::SetValueEvent& event);
 
       void addToParentChildren();
 

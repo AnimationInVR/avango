@@ -22,6 +22,7 @@
 #include <avango/gua/scenegraph/SunLightNode.hpp>
 #include <avango/gua/scenegraph/RayNode.hpp>
 #include <avango/gua/scenegraph/TexturedQuadNode.hpp>
+#include <avango/gua/scenegraph/TexturedScreenSpaceQuadNode.hpp>
 #include <avango/gua/scenegraph/SceneGraph.hpp>
 #include <avango/gua/scenegraph/PickResult.hpp>
 #include <avango/gua/scenegraph/CameraNode.hpp>
@@ -65,11 +66,24 @@
 #include <avango/gua/renderer/Material.hpp>
 #include <avango/gua/renderer/PipelinePassDescription.hpp>
 #include <avango/gua/renderer/TriMeshPassDescription.hpp>
+#include <avango/gua/renderer/TexturedQuadPassDescription.hpp>
+#include <avango/gua/renderer/BackgroundPassDescription.hpp>
+#include <avango/gua/renderer/BBoxPassDescription.hpp>
+#include <avango/gua/renderer/EmissivePassDescription.hpp>
+#include <avango/gua/renderer/PhysicallyBasedShadingPassDescription.hpp>
+#include <avango/gua/renderer/TexturedScreenSpaceQuadPassDescription.hpp>
+#include <avango/gua/renderer/FullscreenPassDescription.hpp>
+#include <avango/gua/renderer/SSAOPassDescription.hpp>
+#include <avango/gua/renderer/ResolvePassDescription.hpp>
+#include <avango/gua/renderer/LightVisibilityPassDescription.hpp>
 #include <avango/gua/renderer/PipelineDescription.hpp>
+
+#include <avango/gua/gui/GuiResource.hpp>
 
 #include <avango/gua/viewer/Viewer.hpp>
 
 #include <avango/gua/utils/Logger.hpp>
+#include <avango/gua/utils/Ray.hpp>
 
 #include <avango/gua/Fields.hpp>
 #include <gua/guacamole.hpp>
@@ -102,7 +116,7 @@ av::gua::Init::initClass()
         av::gua::CameraNode::initClass();
 #if defined(AVANGO_PBR_SUPPORT)
         // av::gua::PBRNode::initClass();
-        // av::gua::PLODNode::initClass();
+        av::gua::PLODNode::initClass();
 #endif
         // av::gua::NURBSNode::initClass();
         av::gua::ScreenNode::initClass();
@@ -111,6 +125,7 @@ av::gua::Init::initClass()
         av::gua::SunLightNode::initClass();
         av::gua::RayNode::initClass();
         av::gua::TexturedQuadNode::initClass();
+        av::gua::TexturedScreenSpaceQuadNode::initClass();
         av::gua::SceneGraph::initClass();
         av::gua::PickResult::initClass();
 
@@ -145,6 +160,16 @@ av::gua::Init::initClass()
         av::gua::Material::initClass();
         av::gua::PipelinePassDescription::initClass();
         av::gua::TriMeshPassDescription::initClass();
+        av::gua::TexturedQuadPassDescription::initClass();
+        av::gua::BackgroundPassDescription::initClass();
+        av::gua::BBoxPassDescription::initClass();
+        av::gua::EmissivePassDescription::initClass();
+        av::gua::PhysicallyBasedShadingPassDescription::initClass();
+        av::gua::TexturedScreenSpaceQuadPassDescription::initClass();
+        av::gua::FullscreenPassDescription::initClass();
+        av::gua::SSAOPassDescription::initClass();
+        av::gua::ResolvePassDescription::initClass();
+        av::gua::LightVisibilityPassDescription::initClass();
         av::gua::PipelineDescription::initClass();
         av::gua::TriMeshLoader::initClass();
         av::gua::SkeletalAnimationLoader::initClass();
@@ -152,13 +177,16 @@ av::gua::Init::initClass()
         // av::gua::VolumeLoader::initClass();
 #if defined(AVANGO_PBR_SUPPORT)
         // av::gua::PBRLoader::initClass();
-        // av::gua::PLODLoader::initClass();
+        av::gua::PLODLoader::initClass();
 #endif
         // av::gua::NURBSLoader::initClass();
+
+        av::gua::GuiResource::initClass();
 
         av::gua::Viewer::initClass();
 
         av::gua::Logger::initClass();
+        av::gua::Ray::initClass();
 
         AV_TYPED_INIT_ABSTRACT(av::Type::badType(), "av::gua::Init", true);
     }
