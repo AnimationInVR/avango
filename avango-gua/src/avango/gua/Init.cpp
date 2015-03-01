@@ -56,6 +56,7 @@
 #if defined(AVANGO_PBR_SUPPORT)
 #include <avango/gua/renderer/PBRLoader.hpp>
 #include <avango/gua/renderer/PLODLoader.hpp>
+#include <avango/gua/renderer/PLODPassDescription.hpp>
 #endif
 #include <avango/gua/renderer/NURBSLoader.hpp>
 #include <avango/gua/renderer/WindowBase.hpp>
@@ -77,8 +78,6 @@
 #include <avango/gua/renderer/ResolvePassDescription.hpp>
 #include <avango/gua/renderer/LightVisibilityPassDescription.hpp>
 #include <avango/gua/renderer/PipelineDescription.hpp>
-
-#include <avango/gua/gui/GuiResource.hpp>
 
 #include <avango/gua/viewer/Viewer.hpp>
 
@@ -178,10 +177,9 @@ av::gua::Init::initClass()
 #if defined(AVANGO_PBR_SUPPORT)
         // av::gua::PBRLoader::initClass();
         av::gua::PLODLoader::initClass();
+        av::gua::PLODPassDescription::initClass();
 #endif
         // av::gua::NURBSLoader::initClass();
-
-        av::gua::GuiResource::initClass();
 
         av::gua::Viewer::initClass();
 

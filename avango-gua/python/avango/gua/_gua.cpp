@@ -85,6 +85,7 @@
 #if defined(AVANGO_PBR_SUPPORT)
 #include "renderer/PBRLoader.hpp"
 #include "renderer/PLODLoader.hpp"
+#include "renderer/PLODPassDescription.hpp"
 #endif
 #include "renderer/NURBSLoader.hpp"
 #include "renderer/Texture.hpp"
@@ -94,8 +95,6 @@
 #include "utils/Color.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Ray.hpp"
-
-#include "gui/GuiResource.hpp"
 
 #if defined(AVANGO_DISTRIBUTION_SUPPORT)
 #include "network/NetTransform.h"
@@ -210,6 +209,7 @@ BOOST_PYTHON_MODULE(_gua)
     // init_VolumeLoader();
 #if defined(AVANGO_PBR_SUPPORT)
     init_PLODLoader();
+    init_PLODPassDescription();
     // init_PBRLoader();
 #endif
     // init_NURBSLoader();
@@ -219,6 +219,4 @@ BOOST_PYTHON_MODULE(_gua)
 
     init_Logger();
     init_Ray();
-
-    init_GuiResource();
 }

@@ -39,7 +39,11 @@ include(find_compiler)
 include(file_copy_macro)
 
 include(find_guacamole)
-include(find_guacamole_gui)
+
+if (AVANGO_PBR_SUPPORT)
+  include(FindGuacamolePLOD)
+endif (AVANGO_PBR_SUPPORT)
+
 set(GUACAMOLE_EXT_DIR ${GUACAMOLE_INCLUDE_DIRS}/../externals)
 
 if (UNIX)
@@ -138,6 +142,7 @@ option (AVANGO_PCL_SUPPORT "Use PCL.")
 option (AVANGO_UNITTESTS "Compile Unittests for Avango.")
 option (AVANGO_OCULUS_RIFT_SUPPORT "Compile Oculus Rift module for Avango.")
 option (AVANGO_OPENAL_SUPPORT "Enable building OpenAL sound module.")
+option (AVANGO_AWESOMIUM_SUPPORT "Enable building Awesomium module.")
 option (AVANGO_DISPLAY_SUPPORT "Enable building display setup module.")
 option (AVANGO_PHYSICS_SUPPORT "Set to enable physics support.")
 option (AVANGO_RUNTIME_PROGRAM_COMPILATION "Set to enable runtime program compilation." ON)
@@ -170,6 +175,11 @@ endif(AVANGO_OCULUS_RIFT_SUPPORT)
 if (AVANGO_OPENAL_SUPPORT)
     add_subdirectory(avango-openal)
 endif(AVANGO_OPENAL_SUPPORT)
+
+if (AVANGO_AWESOMIUM_SUPPORT)
+    include(find_guacamole_gui)
+    add_subdirectory(avango-awesomium)
+endif(AVANGO_AWESOMIUM_SUPPORT)
 
 ################################################################
 # Summary

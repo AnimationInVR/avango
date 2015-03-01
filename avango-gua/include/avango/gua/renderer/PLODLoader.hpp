@@ -7,12 +7,13 @@
  */
 
 #include <gua/renderer/PLODLoader.hpp>
+#include <gua/math.hpp>
 
 #include <avango/gua/Fields.hpp>
 #include <avango/gua/scenegraph/PLODNode.hpp>
 #include <avango/gua/renderer/Material.hpp>
 #include <avango/FieldContainer.h>
-
+#include <avango/gua/scenegraph/PickResult.hpp>
 #include <avango/gua/windows_specific_gua.hpp>
 
 
@@ -52,11 +53,19 @@ namespace av
                                   Flags flags = DEFAULTS) const;
     bool is_supported(std::string const& fileName) const;
 
+    av::gua::MFPickResult* pick_plod_interpolate(
+                                     ::gua::math::vec3 const& bundle_origin,
+                                     ::gua::math::vec3 const& bundle_forward,
+                                     ::gua::math::vec3 const& bundle_up,
+                                     float bundle_radius,
+                                     float max_distance,
+                                     unsigned int max_depth,
+                                     unsigned int surfel_skip) const;
   public:
 
-      SFInt UploadBudget;
-      SFInt RenderBudget;
-      SFInt OutOfCoreBudget;
+      SFInt   UploadBudget;
+      SFInt   RenderBudget;
+      SFInt   OutOfCoreBudget;
 
       /**
        * Get the wrapped ::gua::PLODLoader.

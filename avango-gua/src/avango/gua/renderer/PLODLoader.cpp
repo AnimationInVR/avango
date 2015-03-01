@@ -66,6 +66,34 @@ av::gua::PLODLoader::is_supported(std::string const& fileName) const
   return m_guaPLODLoader->is_supported(fileName);
 }
 
+
+av::gua::MFPickResult*
+av::gua::PLODLoader::pick_plod_interpolate(
+                                      ::gua::math::vec3 const& bundle_origin,
+                                      ::gua::math::vec3 const& bundle_forward,
+                                      ::gua::math::vec3 const& bundle_up,
+                                      float bundle_radius,
+                                      float max_distance,
+                                      unsigned int max_depth,
+                                      unsigned int surfel_skip) const {
+
+  auto gua_results = m_guaPLODLoader->pick_plod_interpolate(bundle_origin,
+                                                bundle_forward,
+                                                bundle_up,
+                                                bundle_radius,
+                                                max_distance,
+                                                max_depth,
+                                                surfel_skip);
+
+  auto results(new av::gua::MFPickResult());
+  for (auto result : gua_results) {
+    results->add1Value(new av::gua::PickResult(result));
+  }
+
+  return results;
+}
+
+
 void
 av::gua::PLODLoader::initClass()
 {
@@ -151,3 +179,4 @@ av::gua::PLODLoader::setOutOfCoreBudgetCB(const SFInt::SetValueEvent& event)
 {
   m_guaPLODLoader->set_out_of_core_budget_in_mb(event.getValue());
 }
+

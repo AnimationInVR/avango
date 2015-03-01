@@ -2,48 +2,49 @@
 
 /************************************************************************\
 *                                                                        *
-* This file is part of AVANGO.                                           *
+* This file is part of Avango.                                           *
 *                                                                        *
-* Copyright 1997 - 2010 Fraunhofer-Gesellschaft zur Foerderung der       *
+* Copyright 1997 - 2008 Fraunhofer-Gesellschaft zur Foerderung der       *
 * angewandten Forschung (FhG), Munich, Germany.                          *
 *                                                                        *
-* AVANGO is free software: you can redistribute it and/or modify         *
+* Avango is free software: you can redistribute it and/or modify         *
 * it under the terms of the GNU Lesser General Public License as         *
 * published by the Free Software Foundation, version 3.                  *
 *                                                                        *
-* AVANGO is distributed in the hope that it will be useful,              *
+* Avango is distributed in the hope that it will be useful,              *
 * but WITHOUT ANY WARRANTY; without even the implied warranty of         *
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           *
 * GNU General Public License for more details.                           *
 *                                                                        *
 * You should have received a copy of the GNU Lesser General Public       *
-* License along with AVANGO. If not, see <http://www.gnu.org/licenses/>. *
+* License along with Avango. If not, see <http://www.gnu.org/licenses/>. *
+*                                                                        *
+* Avango is a trademark owned by FhG.                                    *
 *                                                                        *
 \************************************************************************/
 
-#if !defined(AVANGO_DAEMON_CONFIG_H)
-#define AVANGO_DAEMON_CONFIG_H
 
-/**
- * \file
- * \ingroup av_daemon
- */
+#include "GuiResource.hpp"
+#include <avango/gua/gui/GuiResource.hpp>
+#include <avango/python/register_field.h>
+#include <boost/python.hpp>
 
-#cmakedefine AVANGO_DAEMON_DEBUG
+using namespace boost::python;
+using namespace av::python;
 
-#cmakedefine AVANGO_DAEMON_VRPN_SUPPORT
+namespace boost
+ {
+  namespace python
+   {
+    template <class T> struct pointee<av::Link<T> >
+     {
+      typedef T type;
+     };
+   }
+ }
 
-#ifdef AVANGO_DAEMON_VRPN_SUPPORT
-#define VRPN_SUPPORT 1
-#else
-#undef VRPN_SUPPORT
-#endif
-
-#cmakedefine AVANGO_OCULUS_RIFT_SUPPORT
-
-#define AVANGO_DAEMON_VERSION_MAJOR @AVANGO_DAEMON_VERSION_MAJOR@
-#define AVANGO_DAEMON_VERSION_MINOR @AVANGO_DAEMON_VERSION_MINOR@
-#define AVANGO_DAEMON_VERSION_MAINT @AVANGO_DAEMON_VERSION_MAINT@
-
-#endif // #if !defined(AVANGO_DAEMON_CONFIG_H)
-
+BOOST_PYTHON_MODULE(_gui)
+{
+  av::gua::gui::GuiResource::initClass();
+  init_GuiResource();
+}

@@ -7,7 +7,9 @@
 #include <avango/Application.h>
 #include <avango/Logger.h>
 
+#ifdef AVANGO_AWESOMIUM_SUPPORT
 #include <gua/gui/Interface.hpp>
+#endif
 
 #include <boost/bind.hpp>
 
@@ -38,11 +40,19 @@ av::gua::Viewer::Viewer()
     AV_FC_ADD_ADAPTOR_FIELD(DesiredFPS,
                     boost::bind(&Viewer::getDesiredFPSCB, this, _1),
                     boost::bind(&Viewer::setDesiredFPSCB, this, _1));
+    AV_FC_ADD_ADAPTOR_FIELD(ApplicationFPS,
+                    boost::bind(&Viewer::getApplicationFPSCB, this, _1),
+                    boost::bind(&Viewer::setApplicationFPSCB, this, _1));
 }
 
-
-//av::gua::Viewer::~Viewer()
-//{}
+av::gua::Viewer::~Viewer()
+{
+  if (m_renderer) {
+    m_renderer->getGuaRenderer()->stop();
+    delete m_renderer;
+    m_renderer = nullptr;
+  }
+}
 
 void
 av::gua::Viewer::initClass()
@@ -71,6 +81,71 @@ av::gua::Viewer::setDesiredFPSCB(const av::SFFloat::SetValueEvent& event)
 }
 
 void
+av::gua::Viewer::getApplicationFPSCB(const SFFloat::GetValueEvent& event)
+{
+  if (m_renderer) {
+    *(event.getValuePtr()) = m_renderer->getGuaRenderer()->get_application_fps();
+  }
+}
+
+void
+av::gua::Viewer::setApplicationFPSCB(const SFFloat::SetValueEvent& event)
+{}
+
+void
+av::gua::Viewer::frame() {
+
+  if (!m_renderer) {
+    m_renderer = new av::gua::Renderer(new ::gua::Renderer());
+  }
+
+#if 0
+  for (auto& window: Windows.getValue()) {
+    if(!window->is_open()) {
+      window->open();
+    }
+  }
+#endif
+
+  av::ApplicationInstance::get().evaluate();
+
+#ifdef AVANGO_AWESOMIUM_SUPPORT
+  ::gua::Interface::instance()->update();
+#endif
+
+  if (SceneGraphs.getValue().size() > 0 && CameraNodes.getValue().size() > 0) {
+
+    std::vector<av::gua::CameraNode const*> cams;
+
+    for (auto cam : CameraNodes.getValue()) {
+      cams.push_back(reinterpret_cast<av::gua::CameraNode*> (cam.getBasePtr()));
+    }
+
+    std::vector<av::gua::SceneGraph const*> graphs;
+
+    for (auto graph : SceneGraphs.getValue()) {
+      graphs.push_back(reinterpret_cast<av::gua::SceneGraph*> (graph.getBasePtr()));
+    }
+
+    m_renderer->queue_draw(graphs, cams);
+  }
+
+#if defined(AVANGO_PHYSICS_SUPPORT)
+  if (this->Physics.getValue().isValid()) {
+    this->Physics.getValue()->synchronize(true);
+  }
+#endif
+
+  for (auto& window: Windows.getValue()) {
+    window->process_events();
+
+    if(window->should_close()) {
+      window->close();
+    }
+  }
+}
+
+void
 av::gua::Viewer::run() const {
 
   ::gua::Logger::enable_debug = false;
@@ -91,49 +166,9 @@ av::gua::Viewer::run() const {
   m_ticker.on_tick.connect([&,this]() {
     PyEval_RestoreThread(save_state);
 
-    for (auto& window: Windows.getValue()) {
-      if(!window->is_open()) {
-        window->open();
-      }
-    }
-
-    av::ApplicationInstance::get().evaluate();
-
-    ::gua::Interface::instance()->update();
-
-    if (SceneGraphs.getValue().size() > 0 && CameraNodes.getValue().size() > 0) {
-
-      std::vector<av::gua::CameraNode const*> cams;
-
-      for (auto cam : CameraNodes.getValue()) {
-        cams.push_back(reinterpret_cast<av::gua::CameraNode*> (cam.getBasePtr()));
-      }
-
-      std::vector<av::gua::SceneGraph const*> graphs;
-
-      for (auto graph : SceneGraphs.getValue()) {
-        graphs.push_back(reinterpret_cast<av::gua::SceneGraph*> (graph.getBasePtr()));
-      }
-
-      m_renderer->queue_draw(graphs, cams);
-    }
-
-#if defined(AVANGO_PHYSICS_SUPPORT)
-    if (this->Physics.getValue().isValid()) {
-      this->Physics.getValue()->synchronize(true);
-    }
-#endif
-
-    for (auto& window: Windows.getValue()) {
-      window->process_events();
-
-      if(window->should_close()) {
-        window->close();
-      }
-    }
+    frame();
 
     save_state = PyEval_SaveThread();
-
   });
 
   m_loop.start();
