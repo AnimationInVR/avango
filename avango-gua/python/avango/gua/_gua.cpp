@@ -67,6 +67,7 @@
 #include "renderer/PipelineDescription.hpp"
 #include "renderer/PipelinePassDescription.hpp"
 #include "renderer/TriMeshPassDescription.hpp"
+#include "renderer/SkeletalAnimationPassDescription.hpp"
 #include "renderer/TexturedQuadPassDescription.hpp"
 #include "renderer/BackgroundPassDescription.hpp"
 #include "renderer/BBoxPassDescription.hpp"
@@ -192,6 +193,7 @@ BOOST_PYTHON_MODULE(_gua)
     init_PipelineDescription();
     init_PipelinePassDescription();
     init_TriMeshPassDescription();
+    init_SkeletalAnimationPassDescription();
     init_TexturedQuadPassDescription();
     init_BackgroundPassDescription();
     init_BBoxPassDescription();
