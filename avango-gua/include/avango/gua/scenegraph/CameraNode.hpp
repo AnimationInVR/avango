@@ -10,11 +10,14 @@
 
 #include <avango/gua/scenegraph/Node.hpp>
 #include <avango/gua/renderer/PipelineDescription.hpp>
+#include <avango/gua/math/Frustum.hpp>
 
 namespace av
 {
   namespace gua
   {
+    class SceneGraph;
+
     /**
      * Wrapper for ::gua::CameraNode
      *
@@ -37,13 +40,14 @@ namespace av
         RIGHT   = static_cast<unsigned int>(::gua::CameraMode::RIGHT)
       };
 
-
       /**
        * Constructor. When called without arguments, a new ::gua::CameraNode is created.
        * Otherwise, the given ::gua::CameraNode is used.
        */
       CameraNode( std::shared_ptr< ::gua::node::CameraNode> guaCameraNode =
           std::shared_ptr< ::gua::node::CameraNode>(new ::gua::node::CameraNode("")));
+
+      av::Link<Frustum> get_frustum(SceneGraph const& graph, CameraMode mode);
 
       virtual void on_distribute(av::gua::NetTransform& netNode);
       virtual void on_undistribute(av::gua::NetTransform& netNode);
@@ -86,10 +90,6 @@ namespace av
 
       MFString              WhiteList;
       MFString              BlackList;
-
-      SFFloat               ApplicationFPS;
-      SFFloat               RenderingFPS;
-
 
       MultiField<Link<CameraNode>> PreRenderCameras;
 
@@ -149,12 +149,6 @@ namespace av
 
       virtual void getBlackListCB(const MFString::GetValueEvent& event);
       virtual void setBlackListCB(const MFString::SetValueEvent& event);
-
-      virtual void getApplicationFPSCB(const SFFloat::GetValueEvent& event);
-      virtual void setApplicationFPSCB(const SFFloat::SetValueEvent& event);
-
-      virtual void getRenderingFPSCB(const SFFloat::GetValueEvent& event);
-      virtual void setRenderingFPSCB(const SFFloat::SetValueEvent& event);
 
       virtual void getPreRenderCamerasCB(const  MultiField<Link<CameraNode>>::GetValueEvent& event);
       virtual void setPreRenderCamerasCB(const  MultiField<Link<CameraNode>>::SetValueEvent& event);

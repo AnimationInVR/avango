@@ -4,6 +4,7 @@
 
 #include <avango/gua/scenegraph/Node.hpp>
 #include <avango/gua/scenegraph/TransformNode.hpp>
+#include <avango/gua/scenegraph/ClippingPlaneNode.hpp>
 #include <avango/gua/scenegraph/GeometryNode.hpp>
 #include <avango/gua/scenegraph/LODNode.hpp>
 #include <avango/gua/scenegraph/TriMeshNode.hpp>
@@ -28,6 +29,7 @@
 #include <avango/gua/scenegraph/CameraNode.hpp>
 
 #include <avango/gua/math/BoundingBox.hpp>
+#include <avango/gua/math/Frustum.hpp>
 #include <avango/gua/math/BoundingSphere.hpp>
 
 #if defined(AVANGO_PHYSICS_SUPPORT)
@@ -60,6 +62,7 @@
 #include <avango/gua/renderer/NURBSLoader.hpp>
 #include <avango/gua/renderer/WindowBase.hpp>
 #include <avango/gua/renderer/Window.hpp>
+#include <avango/gua/renderer/HeadlessSurface.hpp>
 #include <avango/gua/renderer/GlfwWindow.hpp>
 #include <avango/gua/renderer/MaterialShaderMethod.hpp>
 #include <avango/gua/renderer/MaterialShaderDescription.hpp>
@@ -67,6 +70,7 @@
 #include <avango/gua/renderer/PipelinePassDescription.hpp>
 #include <avango/gua/renderer/TriMeshPassDescription.hpp>
 #include <avango/gua/renderer/TexturedQuadPassDescription.hpp>
+#include <avango/gua/renderer/DebugViewPassDescription.hpp>
 #include <avango/gua/renderer/BackgroundPassDescription.hpp>
 #include <avango/gua/renderer/BBoxPassDescription.hpp>
 #include <avango/gua/renderer/EmissivePassDescription.hpp>
@@ -79,6 +83,7 @@
 #include <avango/gua/renderer/PipelineDescription.hpp>
 
 #include <avango/gua/viewer/Viewer.hpp>
+#include <avango/gua/viewer/BlenderViewer.hpp>
 
 #include <avango/gua/utils/Logger.hpp>
 #include <avango/gua/utils/Ray.hpp>
@@ -106,6 +111,7 @@ av::gua::Init::initClass()
         av::gua::Node::initClass();
         av::gua::GeometryNode::initClass();
         av::gua::TransformNode::initClass();
+        av::gua::ClippingPlaneNode::initClass();
         av::gua::LODNode::initClass();
         av::gua::TriMeshNode::initClass();        
         // av::gua::Video3DNode::initClass();
@@ -127,6 +133,7 @@ av::gua::Init::initClass()
         av::gua::PickResult::initClass();
 
         av::gua::BoundingBox::initClass();
+        av::gua::Frustum::initClass();
         av::gua::BoundingSphere::initClass();
 
 #if defined(AVANGO_PHYSICS_SUPPORT)
@@ -151,6 +158,7 @@ av::gua::Init::initClass()
         av::gua::Renderer::initClass();
         av::gua::WindowBase::initClass();
         av::gua::Window::initClass();
+        av::gua::HeadlessSurface::initClass();
         av::gua::GlfwWindow::initClass();
         av::gua::MaterialShaderMethod::initClass();
         av::gua::MaterialShaderDescription::initClass();
@@ -158,6 +166,7 @@ av::gua::Init::initClass()
         av::gua::PipelinePassDescription::initClass();
         av::gua::TriMeshPassDescription::initClass();
         av::gua::TexturedQuadPassDescription::initClass();
+        av::gua::DebugViewPassDescription::initClass();
         av::gua::BackgroundPassDescription::initClass();
         av::gua::BBoxPassDescription::initClass();
         av::gua::EmissivePassDescription::initClass();
@@ -179,6 +188,7 @@ av::gua::Init::initClass()
         // av::gua::NURBSLoader::initClass();
 
         av::gua::Viewer::initClass();
+        av::gua::BlenderViewer::initClass();
 
         av::gua::Logger::initClass();
         av::gua::Ray::initClass();
