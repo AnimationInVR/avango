@@ -1,4 +1,5 @@
 #include <avango/gua/scenegraph/CameraNode.hpp>
+#include <avango/gua/scenegraph/SceneGraph.hpp>
 #include <avango/gua/network/NetTransform.h>
 #include <avango/Base.h>
 #include <boost/bind.hpp>
@@ -96,14 +97,6 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
                       boost::bind(&CameraNode::getBlackListCB, this, _1),
                       boost::bind(&CameraNode::setBlackListCB, this, _1));
 
-  AV_FC_ADD_ADAPTOR_FIELD(ApplicationFPS,
-                      boost::bind(&CameraNode::getApplicationFPSCB, this, _1),
-                      boost::bind(&CameraNode::setApplicationFPSCB, this, _1));
-
-  AV_FC_ADD_ADAPTOR_FIELD(RenderingFPS,
-                      boost::bind(&CameraNode::getRenderingFPSCB, this, _1),
-                      boost::bind(&CameraNode::setRenderingFPSCB, this, _1));
-
   AV_FC_ADD_ADAPTOR_FIELD(PreRenderCameras,
                       boost::bind(&CameraNode::getPreRenderCamerasCB, this, _1),
                       boost::bind(&CameraNode::setPreRenderCamerasCB, this, _1));
@@ -111,6 +104,10 @@ av::gua::CameraNode::CameraNode(std::shared_ptr< ::gua::node::CameraNode> guaCam
 
 av::gua::CameraNode::~CameraNode()
 {}
+
+av::Link<av::gua::Frustum> av::gua::CameraNode::get_frustum(av::gua::SceneGraph const& graph, av::gua::CameraNode::CameraMode mode) {
+  return av::Link<av::gua::Frustum>(new av::gua::Frustum(new ::gua::Frustum(m_guaNode->get_frustum(*graph.getGuaSceneGraph(), static_cast< ::gua::CameraMode >(mode)))));
+}
 
 void av::gua::CameraNode::on_distribute(av::gua::NetTransform& netNode)
 {
@@ -387,26 +384,6 @@ av::gua::CameraNode::setBlackListCB(const MFString::SetValueEvent& event)
 }
 
 void
-av::gua::CameraNode::getApplicationFPSCB(const SFFloat::GetValueEvent& event)
-{
-  *(event.getValuePtr()) = m_guaNode->get_application_fps();
-}
-
-void
-av::gua::CameraNode::setApplicationFPSCB(const SFFloat::SetValueEvent& event)
-{}
-
-void
-av::gua::CameraNode::getRenderingFPSCB(const SFFloat::GetValueEvent& event)
-{
-  *(event.getValuePtr()) = m_guaNode->get_rendering_fps();
-}
-
-void
-av::gua::CameraNode::setRenderingFPSCB(const SFFloat::SetValueEvent& event)
-{}
-
-void
 av::gua::CameraNode::getPreRenderCamerasCB(const MultiField<Link<CameraNode>>::GetValueEvent& event)
 {
   *(event.getValuePtr()) = m_preRenderCameraNodes;
@@ -424,4 +401,3 @@ av::gua::CameraNode::setPreRenderCamerasCB(const MultiField<Link<CameraNode>>::S
 
   m_guaNode->set_pre_render_cameras(gua_cams);
 }
-

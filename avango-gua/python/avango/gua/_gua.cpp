@@ -15,6 +15,7 @@
 #include "scenegraph/Node.hpp"
 #include "scenegraph/GeometryNode.hpp"
 #include "scenegraph/TransformNode.hpp"
+#include "scenegraph/ClippingPlaneNode.hpp"
 #include "scenegraph/LODNode.hpp"
 #include "scenegraph/TriMeshNode.hpp"
 #include "scenegraph/SkeletalAnimationNode.hpp"
@@ -37,6 +38,7 @@
 #include "scenegraph/PickResult.hpp"
 
 #include "math/BoundingBox.hpp"
+#include "math/Frustum.hpp"
 #include "math/BoundingSphere.hpp"
 
 #if defined(AVANGO_PHYSICS_SUPPORT)
@@ -60,6 +62,7 @@
 
 #include "renderer/WindowBase.hpp"
 #include "renderer/Window.hpp"
+#include "renderer/HeadlessSurface.hpp"
 #include "renderer/GlfwWindow.hpp"
 #include "renderer/MaterialShaderMethod.hpp"
 #include "renderer/MaterialShaderDescription.hpp"
@@ -69,6 +72,7 @@
 #include "renderer/TriMeshPassDescription.hpp"
 #include "renderer/SkeletalAnimationPassDescription.hpp"
 #include "renderer/TexturedQuadPassDescription.hpp"
+#include "renderer/DebugViewPassDescription.hpp"
 #include "renderer/BackgroundPassDescription.hpp"
 #include "renderer/BBoxPassDescription.hpp"
 #include "renderer/EmissivePassDescription.hpp"
@@ -92,6 +96,7 @@
 #include "renderer/Texture.hpp"
 
 #include "viewer/Viewer.hpp"
+#include "viewer/BlenderViewer.hpp"
 
 #include "utils/Color.hpp"
 #include "utils/Logger.hpp"
@@ -137,6 +142,7 @@ BOOST_PYTHON_MODULE(_gua)
     init_Node();
     init_GeometryNode();
     init_TransformNode();
+    init_ClippingPlaneNode();
     init_CameraNode();
     init_LODNode();
 #if defined(AVANGO_DISTRIBUTION_SUPPORT)
@@ -163,6 +169,7 @@ BOOST_PYTHON_MODULE(_gua)
     init_PickResult();
 
     init_BoundingBox();
+    init_Frustum();
     init_BoundingSphere();
 
 #if defined(AVANGO_PHYSICS_SUPPORT)
@@ -186,6 +193,7 @@ BOOST_PYTHON_MODULE(_gua)
 
     init_WindowBase();
     init_Window();
+    init_HeadlessSurface();
     init_GlfwWindow();
     init_MaterialShaderMethod();
     init_MaterialShaderDescription();
@@ -195,6 +203,7 @@ BOOST_PYTHON_MODULE(_gua)
     init_TriMeshPassDescription();
     init_SkeletalAnimationPassDescription();
     init_TexturedQuadPassDescription();
+    init_DebugViewPassDescription();
     init_BackgroundPassDescription();
     init_BBoxPassDescription();
     init_EmissivePassDescription();
@@ -218,6 +227,7 @@ BOOST_PYTHON_MODULE(_gua)
     init_Texture();
 
     init_Viewer();
+    init_BlenderViewer();
 
     init_Logger();
     init_Ray();

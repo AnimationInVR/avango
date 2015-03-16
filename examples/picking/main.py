@@ -67,9 +67,6 @@ def start():
                   "data/objects/sphere.obj",
                   avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
 
-        if isinstance(new_cube, avango.gua.TriMeshNode):
-          new_cube.Material.value.set_uniform("Emissivity", 0.5)
-
         new_cube.Transform.value = avango.gua.make_trans_mat(x, y, z) * \
                                    avango.gua.make_scale_mat(0.3, 0.3, 0.3)
         graph.Root.value.Children.value.append(new_cube)
@@ -151,7 +148,6 @@ def start():
   camera.Transform.connect_from(navigator.OutTransform)
 
   viewer = avango.gua.nodes.Viewer()
-  viewer.CameraNodes.value = [camera]
   viewer.SceneGraphs.value = [graph]
   viewer.Windows.value = [window]
 
