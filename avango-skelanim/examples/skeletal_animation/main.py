@@ -1,7 +1,8 @@
 import avango
 import avango.script
 from avango.script import field_has_changed
-import avango.gua
+# import avango.gua
+import avango.gua.skelanim
 from examples_common.GuaVE import GuaVE
 import math
 
@@ -125,7 +126,7 @@ def start():
   # setup scenegraph
   graph = avango.gua.nodes.SceneGraph(Name = "scenegraph")
 
-  loader = avango.gua.nodes.SkeletalAnimationLoader()
+  loader = avango.gua.skelanim.nodes.SkeletalAnimationLoader()
 
   bob_nav = avango.gua.nodes.TransformNode(Name = "bob_nav")
   bob_ground = avango.gua.nodes.TransformNode(Name = "bob_ground")
@@ -231,7 +232,7 @@ def start():
       Passes = [
             avango.gua.nodes.TriMeshPassDescription(),
             avango.gua.nodes.LightVisibilityPassDescription(),
-            avango.gua.nodes.SkeletalAnimationPassDescription(),
+            avango.gua.skelanim.nodes.SkeletalAnimationPassDescription(),
             avango.gua.nodes.ResolvePassDescription()
           ])
 
